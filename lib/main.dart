@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:taskapp/NoteFeatures/data/noteModel.dart';
 import 'package:taskapp/NoteFeatures/presentation/screens/home.dart';
 
 void main() {
-
+  Hive.initFlutter();
+  Hive.registerAdapter(NoteModelAdapter());
   runApp(const MainApp());
 }
 
