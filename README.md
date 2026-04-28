@@ -17,5 +17,6 @@ Bu projede kodun sürdürülebilirliği ve test edilebilirliği için Clean Arch
 
 ### ✨ Özellikler
 * Not ekleme, silme ve düzenleme.
+* Tema değiştirme.
 * Yerel depolama sayesinde çevrimdışı çalışma desteği.
 
