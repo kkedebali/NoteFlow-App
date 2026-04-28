@@ -21,8 +21,7 @@ class NoteRepoImpl implements NoteIRepo {
   @override
   Future<void> deleteNote(String id) async {
     final box = await _getBox();
-
-    await box.delete(id);
+    await box.delete(id.toString());
   }
 
   @override

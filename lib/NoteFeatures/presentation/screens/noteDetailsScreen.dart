@@ -14,6 +14,7 @@ class NoteDetailScreen extends ConsumerStatefulWidget {
 class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
   late TextEditingController contentController;
   late TextEditingController titleController;
+  bool _isDeleted = false;
 
   @override
   void initState() {
@@ -50,13 +51,17 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
           // Sayfa kapanırken sessizce kaydet
-          await _saveNote();
+          if (!_isDeleted) {
+            await _saveNote();
+          }
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.blue, // Apple tarzı beyaz arka plan
+        backgroundColor: Theme.of(
+          context,
+        ).cardColor, // Apple tarzı beyaz arka plan
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Theme.of(context).cardColor,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -76,14 +81,17 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: TextField(
                 controller: titleController,
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   hintText: 'Başlık',
                 ),
               ),
             ),
-            
+
             // İçerik TextField (Görünmez ve Tam Ekran)
             Expanded(
               child: Padding(
@@ -122,9 +130,14 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Notu Sil', style: TextStyle(color: Colors.red)),
+              title: const Text(
+                'Notu Sil',
+                style: TextStyle(color: Colors.red),
+              ),
               onTap: () async {
+                _isDeleted = true;
                 await ref.read(deleteNoteUseCaseProvider).call(widget.note.id);
+
                 ref.invalidate(notesFutureProvider);
                 Navigator.pop(context); // Modal kapat
                 Navigator.pop(context); // Sayfa kapat

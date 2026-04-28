@@ -44,7 +44,6 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
             padding: EdgeInsets.all(20),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.white,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -54,7 +53,6 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Modalın tepesindeki o küçük çizgi (UX dokunuşu)
                 Container(
                   width: 40,
                   height: 5,
@@ -64,21 +62,62 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
                   ),
                 ),
                 SizedBox(height: 10),
-                GestureDetector(
-                  onTap: () async {
-                    await ref.read(deleteAllUseCaseProvider).call();
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
-                    ref.invalidate(notesFutureProvider);
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          await ref.read(deleteAllUseCaseProvider).call();
 
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    'Tüm notları sil',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Colors.red,
-                    ),
+                          ref.invalidate(notesFutureProvider);
+
+                          Navigator.pop(context);
+                        },
+                        child: ListTile(
+                          leading: Icon(Icons.delete, color: Colors.red),
+                          title: Text(
+                            'Tüm notları sil',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 5),
+
+                      GestureDetector(
+                        onTap: () {
+                          final currentTheme = ref.read(themeProvider);
+                          ref
+                              .read(themeProvider.notifier)
+                              .state = currentTheme == ThemeMode.dark
+                              ? ThemeMode.light
+                              : ThemeMode.dark;
+
+                          Navigator.pop(context);
+                        },
+                        child: ListTile(
+                          leading: Icon(
+                            ref.watch(themeProvider) == ThemeMode.dark
+                                ? Icons.dark_mode
+                                : Icons.light_mode,
+                          ),
+                          title: Text(
+                            'Temayı değiştir',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -95,7 +134,6 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
         builder: (context) {
           return Container(
             decoration: BoxDecoration(
-              color: Colors.white,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -132,8 +170,8 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
                     horizontal: 20.0,
                     vertical: 10.0,
                   ),
-                  child: ElevatedButton(
-                    onPressed: () async {
+                  child: GestureDetector(
+                    onTap: () async {
                       try {
                         final newNote = NoteEntity(
                           id: Uuid().v4(),
@@ -148,12 +186,25 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
                       } catch (e) {
                         print('Hata: $e');
                       } finally {
-                        headController.text = "";
-                        contentController.text = "";
+                        headController.clear();
+                        contentController.clear;
                         Navigator.pop(context);
                       }
                     },
-                    child: Text('Kaydet'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14.0,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(50)),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      child: Text(
+                        'Kaydet',
+                        style: TextStyle(fontSize: 18, color: Colors.black),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -191,7 +242,6 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: Center(
           child: Column(
@@ -228,7 +278,12 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
                     data: (notes) {
                       if (notes.isEmpty) {
                         return SizedBox(
-                          child: Center(child: Text('Notlarınız boş')),
+                          child: Center(child: Text(
+                            textAlign: TextAlign.center,
+                            'Notlarınız boş + tıklayarak ilk notunuzu ekleyin',style: TextStyle(
+                            fontSize: 20,
+                            color: Theme.of(context).hintColor,
+                          ),)),
                         );
                       }
                       return ListView.builder(
@@ -316,7 +371,7 @@ class _NoteCardState extends State<NoteCard> {
                 minWidth: _width,
               ),
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Theme.of(context).cardColor,
                 borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(50.0),
                   bottomRight: Radius.circular(50.0),
