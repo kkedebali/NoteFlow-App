@@ -12,12 +12,25 @@ class NoteFlowHome extends ConsumerStatefulWidget {
   ConsumerState<NoteFlowHome> createState() => _NoteFlowHomeState();
 }
 
-TextEditingController contentController = TextEditingController();
-TextEditingController headController = TextEditingController();
-double _width = 100;
-bool _isExpanding = false;
-
 class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
+  late final TextEditingController contentController;
+  late final TextEditingController headController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    contentController = TextEditingController();
+    headController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    contentController.dispose();
+    headController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final noteAsync = ref.watch(notesFutureProvider);
@@ -50,21 +63,25 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                SizedBox(height: 10,),
+                SizedBox(height: 10),
                 GestureDetector(
-                  onTap: () async{
+                  onTap: () async {
                     await ref.read(deleteAllUseCaseProvider).call();
 
                     ref.invalidate(notesFutureProvider);
 
                     Navigator.pop(context);
                   },
-                  child: Text('Tüm notları sil',style: TextStyle(
+                  child: Text(
+                    'Tüm notları sil',
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                       color: Colors.red,
-                    ),))
-              ]
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -130,7 +147,9 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
                         ref.invalidate(notesFutureProvider);
                       } catch (e) {
                         print('Hata: $e');
-                      }finally{
+                      } finally {
+                        headController.text = "";
+                        contentController.text = "";
                         Navigator.pop(context);
                       }
                     },
@@ -209,7 +228,6 @@ class _NoteFlowHomeState extends ConsumerState<NoteFlowHome> {
                     data: (notes) {
                       if (notes.isEmpty) {
                         return SizedBox(
-                          
                           child: Center(child: Text('Notlarınız boş')),
                         );
                       }
@@ -285,44 +303,47 @@ class _NoteCardState extends State<NoteCard> {
         },
         child: Hero(
           tag: 'note_${widget.note.id}', // ID bazlı benzersiz tag
-          child: AnimatedContainer(
-            margin: EdgeInsets.only(bottom: 10),
-            duration: const Duration(milliseconds: 350),
-            curve: Curves.fastOutSlowIn,
-            constraints: BoxConstraints(
-              maxWidth: _isExpanding
-                  ? MediaQuery.of(context).size.width
-                  : MediaQuery.of(context).size.width * 0.8,
-              minWidth: _width,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(50.0),
-                bottomRight: Radius.circular(50.0),
+          child: Material(
+            color: Colors.transparent,
+            child: AnimatedContainer(
+              margin: EdgeInsets.only(bottom: 10),
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.fastOutSlowIn,
+              constraints: BoxConstraints(
+                maxWidth: _isExpanding
+                    ? MediaQuery.of(context).size.width
+                    : MediaQuery.of(context).size.width * 0.8,
+                minWidth: _width,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(10),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(50.0),
+                  bottomRight: Radius.circular(50.0),
                 ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.note.title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(10),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.note.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
