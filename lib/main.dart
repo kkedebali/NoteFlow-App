@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:taskapp/NoteFeatures/data/noteModel.dart';
 import 'package:taskapp/NoteFeatures/presentation/screens/home.dart';
@@ -6,7 +7,8 @@ import 'package:taskapp/NoteFeatures/presentation/screens/home.dart';
 void main() {
   Hive.initFlutter();
   Hive.registerAdapter(NoteModelAdapter());
-  runApp(const MainApp());
+
+  runApp(ProviderScope(child: const MainApp()));
 }
 
 class MainApp extends StatelessWidget {
