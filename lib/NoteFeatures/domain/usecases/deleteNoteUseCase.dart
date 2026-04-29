@@ -1,3 +1,4 @@
+import 'package:taskapp/NoteFeatures/domain/entities/noteEntity.dart';
 import 'package:taskapp/NoteFeatures/domain/noteIRepo.dart';
 
 class DeleteNoteUseCase {
@@ -5,6 +6,8 @@ class DeleteNoteUseCase {
   DeleteNoteUseCase(this.noteIRepo);
 
   Future<void> call(String id) async {
-    await noteIRepo.deleteNote(id);
+    
+      await noteIRepo.deleteNote(id);
+    
   }
 }
